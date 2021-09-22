@@ -133,27 +133,48 @@ local scroll_in_signature = function (direction)
   api.nvim_buf_set_var(0,'saga_signature_help_win',{swin,current_win_lnum,last_lnum,height})
 end
 
-local call_back = function(_, method, result)
-  if not (result and result.signatures and result.signatures[1]) then
---     print('No signature help available')
-    return
+local call_back = (function ()
+  --- TODO: remove after nvim 5.1 is released
+  if vim.fn.has('nvim-0.5') == 1 then
+    return function(_, method, result)
+      if not (result and result.signatures and result.signatures[1]) then
+        --     print('No signature help available')
+        return
+      end
+      local lines = util.convert_signature_help_to_markdown_lines(result)
+      lines = util.trim_empty_lines(lines)
+      if vim.tbl_isempty(lines) then
+        --     print('No signature help available')
+        return
+      end
+      focusable_preview(method, function()
+        return lines, util.try_trim_markdown_code_blocks(lines)
+      end)
+    end
   end
-  local lines = util.convert_signature_help_to_markdown_lines(result)
-  lines = util.trim_empty_lines(lines)
-  if vim.tbl_isempty(lines) then
---     print('No signature help available')
-    return
+
+  return function(_, result, ctx, _)
+    if not (result and result.signatures and result.signatures[1]) then
+      --     print('No signature help available')
+      return
+    end
+    local lines = util.convert_signature_help_to_markdown_lines(result)
+    lines = util.trim_empty_lines(lines)
+    if vim.tbl_isempty(lines) then
+      print('No signature help available')
+      return
+    end
+    focusable_preview(ctx.method, function()
+      return lines, util.try_trim_markdown_code_blocks(lines)
+    end)
   end
-  focusable_preview(method, function()
-    return lines, util.try_trim_markdown_code_blocks(lines)
-  end)
-end
+end)()
 
 local signature_help = function()
   -- check the server support the signature help
   if not check_server_support_signaturehelp() then return end
   local params = util.make_position_params()
-  vim.lsp.buf_request(0,'textDocument/signatureHelp', params,call_back)
+  vim.lsp.buf_request(0,'textDocument/signatureHelp', params, call_back)
 end
 
 return {

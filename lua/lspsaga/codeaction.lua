@@ -60,7 +60,11 @@ local need_check_diagnostic = {
 }
 
 function Action:render_action_virtual_text(line, diagnostics)
-  return function(_, actions)
+  return function(_, method, actions)
+    if vim.fn.has('nvim-0.5.1') == 1 then
+        actions = method
+    end
+
     if actions == nil or type(actions) ~= "table" or vim.tbl_isempty(actions) then
       if config.code_action_prompt.virtual_text then
         _update_virtual_text(nil)
@@ -97,7 +101,11 @@ function Action:render_action_virtual_text(line, diagnostics)
 end
 
 function Action:action_callback()
-  return function(_, response)
+  return function(_, method, response)
+    if vim.fn.has('nvim-0.5.1') == 1 then
+        response = method
+    end
+
     if response == nil or vim.tbl_isempty(response) then
       print "No code actions available"
       return

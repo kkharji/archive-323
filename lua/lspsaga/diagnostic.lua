@@ -10,10 +10,10 @@ local M = {}
 
 -- :h diagnostic-highlights
 local diagnostic_highlights = {
-    [vim.diagnostic.severity.ERROR] = "DiagnosticFloatingError",
-    [vim.diagnostic.severity.WARN] = "DiagnosticFloatingWarn",
-    [vim.diagnostic.severity.INFO] = "DiagnosticFloatingInfo",
-    [vim.diagnostic.severity.HINT] = "DiagnosticFloatingHint"
+  [vim.diagnostic.severity.ERROR] = "DiagnosticFloatingError",
+  [vim.diagnostic.severity.WARN] = "DiagnosticFloatingWarn",
+  [vim.diagnostic.severity.INFO] = "DiagnosticFloatingInfo",
+  [vim.diagnostic.severity.HINT] = "DiagnosticFloatingHint",
 }
 
 local function _iter_diagnostic_move_pos(name, opts, pos)
@@ -226,4 +226,3 @@ function M.lsp_diagnostic_sign(opts)
 end
 
 return M
-

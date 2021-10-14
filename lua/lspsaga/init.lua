@@ -64,11 +64,23 @@ end
 
 function saga.init_lsp_saga(opts)
   extend_config(opts)
-  local diagnostic = require "lspsaga.diagnostic"
 
   if saga.config_values.use_saga_diagnostic_sign then
-    diagnostic.lsp_diagnostic_sign(saga.config_values)
+    for type, icon in pairs {
+      Error = saga.error_sign,
+      Warn = saga.warn_sign,
+      Hint = saga.hint_sign,
+      Info = saga.infor_sign,
+    } do
+      local hl = "DiagnosticSign" .. type
+      vim.fn.sign_define(hl, {
+        text = icon,
+        texthl = hl,
+        numhl = "",
+      })
+    end
   end
+
   if saga.config_values.code_action_prompt.enable then
     vim.cmd [[autocmd CursorHold,CursorHoldI * lua require'lspsaga.codeaction'.code_action_prompt()]]
   end

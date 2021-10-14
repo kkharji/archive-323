@@ -204,16 +204,4 @@ function M.show_line_diagnostics(opts, bufnr, line_nr, client_id)
   return show_diagnostics(opts, get_line_diagnostics)
 end
 
-function M.lsp_diagnostic_sign(opts)
-  for type, icon in pairs {
-    Error = opts.error_sign,
-    Warn = opts.warn_sign,
-    Hint = opts.hint_sign,
-    Info = opts.infor_sign,
-  } do
-    local hl = "DiagnosticSign" .. type
-    vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
-  end
-end
-
 return M

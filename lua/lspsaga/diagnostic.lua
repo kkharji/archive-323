@@ -8,16 +8,12 @@ local hover = require "lspsaga.hover"
 local fmt = string.format
 local M = {}
 
--- :h diagnostic-highlights
-local diagnostic_highlights = {}
-if vim.diagnostic then
-  diagnostic_highlights = {
-    [vim.diagnostic.severity.ERROR] = "DiagnosticFloatingError",
-    [vim.diagnostic.severity.WARN] = "DiagnosticFloatingWarn",
-    [vim.diagnostic.severity.INFO] = "DiagnosticFloatingInfo",
-    [vim.diagnostic.severity.HINT] = "DiagnosticFloatingHint",
-  }
-end
+M.highlights = {
+  [vim.diagnostic.severity.ERROR] = "DiagnosticFloatingError",
+  [vim.diagnostic.severity.WARN] = "DiagnosticFloatingWarn",
+  [vim.diagnostic.severity.INFO] = "DiagnosticFloatingInfo",
+  [vim.diagnostic.severity.HINT] = "DiagnosticFloatingHint",
+}
 
 ---TODO(refactor): move to popup.lua
 local show_diagnostics = function(opts, get_diagnostics)
@@ -64,8 +60,7 @@ local show_diagnostics = function(opts, get_diagnostics)
 
   for i, diagnostic in ipairs(diagnostics) do
     local prefix = string.format("%d. ", i)
-    local hiname = diagnostic_highlights[diagnostic.severity]
-      or vim.lsp.diagnostic._get_floating_severity_highlight_name(diagnostic.severity)
+    local hiname = M.highlights[diagnostic.severity]
     assert(hiname, "unknown severity: " .. tostring(diagnostic.severity))
 
     local message_lines = vim.split(diagnostic.message, "\n", true)
@@ -104,56 +99,53 @@ local show_diagnostics = function(opts, get_diagnostics)
   return winid
 end
 
-M.show_cursor_diagnostics = function(opts, bufnr, client_id)
-  opts = opts or {}
-  return show_diagnostics(opts, function()
-    bufnr = bufnr or 0
+M.show_cursor_diagnostics = function(opts, bufnr)
+  return show_diagnostics(opts or {}, function()
     local cursor = vim.api.nvim_win_get_cursor(0)
     local lnum, cnum = cursor[1] - 1, cursor[2]
 
-    return vim.tbl_filter(function(diagnostic)
-      local start_pos = diagnostic["range"]["start"]
-      local end_pos = diagnostic["range"]["end"]
-      local start_line, start_char = start_pos["line"], start_pos["character"]
-      local end_line, end_char = end_pos["line"], end_pos["character"]
-      local one_line_diag = start_line == end_line
+    return vim.tbl_filter(
+      function(diagnostic)
+        local start_pos = diagnostic["range"]["start"]
+        local end_pos = diagnostic["range"]["end"]
+        local start_line, start_char = start_pos["line"], start_pos["character"]
+        local end_line, end_char = end_pos["line"], end_pos["character"]
+        local one_line_diag = start_line == end_line
 
-      if one_line_diag and start_line == lnum then
-        if cnum >= start_char and cnum < end_char then
-          return true
+        if one_line_diag and start_line == lnum then
+          if cnum >= start_char and cnum < end_char then
+            return true
+          end
+          -- multi line diagnostic
+        else
+          if lnum == start_line and cnum >= start_char then
+            return true
+          elseif lnum == end_line and cnum < end_char then
+            return true
+          elseif lnum > start_line and lnum < end_line then
+            return true
+          end
         end
-        -- multi line diagnostic
-      else
-        if lnum == start_line and cnum >= start_char then
-          return true
-        elseif lnum == end_line and cnum < end_char then
-          return true
-        elseif lnum > start_line and lnum < end_line then
-          return true
-        end
-      end
 
-      return false
-    end, vim.lsp.diagnostic.get(
-      bufnr,
-      client_id
-    ))
+        return false
+      end,
+      vim.diagnostic.get(bufnr, {
+        lnum = lnum,
+      })
+    )
   end)
 end
 
-M.show_line_diagnostics = function(opts, bufnr, lnum, client_id)
-  opts = opts or {}
-  return show_diagnostics(opts, function()
-    bufnr = bufnr or 0
-    lnum = lnum or (vim.api.nvim_win_get_cursor(0)[1] - 1)
-    return vim.lsp.diagnostic.get_line_diagnostics(bufnr, lnum, opts, client_id)
+M.show_line_diagnostics = function(opts, lnum, bufnr)
+  return show_diagnostics(opts or {}, function()
+    return vim.diagnostic.get(bufnr, { lnum = lnum or (vim.api.nvim_win_get_cursor(0)[1] - 1) })
   end)
 end
 
 M.navigate = function(direction)
   return function(opts)
     opts = opts or {}
-    local pos = vim.lsp.diagnostic[fmt("get_%s_pos", direction)](opts)
+    local pos = vim.diagnostic[fmt("get_%s_pos", direction)](opts)
     if not pos then
       --- TODO: move to notify.lua, notify.diagnostics.no_more_diagnostics(direction:gsub("^%l", string.upper)))
       return print(fmt("Diagnostic%s: No more valid diagnostics to move to.", direction:gsub("^%l", string.upper)))
@@ -162,12 +154,31 @@ M.navigate = function(direction)
     local win_id = opts.win_id or vim.api.nvim_get_current_win()
     vim.api.nvim_win_set_cursor(win_id, { pos[1] + 1, pos[2] })
 
-    if if_nil(opts.enable_popup, true) then
-      vim.schedule(function()
-        M.show_line_diagnostics(opts.popup_opts, vim.api.nvim_win_get_buf(win_id))
-      end)
-    end
+    vim.schedule(function()
+      M.show_line_diagnostics(opts.popup_opts, nil, vim.api.nvim_win_get_buf(win_id))
+    end)
   end
 end
+
+--- TODO: at some point just use builtin function to preview diagnostics
+--- Missing borders and formating of title
+-- vim.diagnostic.show_position_diagnostics {
+--   focusable = false,
+--   close_event = { "CursorMoved", "CursorMovedI", "BufHidden", "BufLeave" },
+--   source = false,
+--   show_header = true,
+--   border = "rounded",
+--   format = function(info)
+--     local lines = {}
+--     if config.diagnostic_show_source then
+--       lines[#lines + 1] = info.source:gsub("%.", ":")
+--     end
+--     lines[#lines + 1] = info.message
+--     if config.diagnostic_show_code then
+--       lines[#lines + 1] = fmt("(%s)", info.user_data.lsp.code)
+--     end
+--     return table.concat(lines, " ")
+--   end,
+-- }
 
 return M

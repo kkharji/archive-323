@@ -62,7 +62,7 @@ local extend_config = function(opts)
   end
 end
 
-function saga.init_lsp_saga(opts)
+saga.init_lsp_saga = function(opts)
   extend_config(opts)
 
   if saga.config_values.use_saga_diagnostic_sign then
@@ -85,5 +85,7 @@ function saga.init_lsp_saga(opts)
     vim.cmd [[autocmd CursorHold,CursorHoldI * lua require'lspsaga.codeaction'.code_action_prompt()]]
   end
 end
+
+saga.setup = saga.init_lsp_saga
 
 return saga

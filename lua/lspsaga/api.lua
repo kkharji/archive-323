@@ -1,14 +1,11 @@
 local M = {}
 
-M.code_action_request = function(cb, winid)
-  winid = winid or vim.api.nvim_get_current_win()
-  local bufnr = vim.api.nvim_get_current_buf()
-  local diagnostics = vim.diagnostic.get(bufnr, { lnum = vim.api.nvim_win_get_cursor(winid)[1] - 1 })
+M.code_action_request = function(args)
+  local winid, bufnr = args.winid or vim.api.nvim_get_current_win(), vim.api.nvim_get_current_buf()
   local method = "textDocument/codeAction"
-  local params = vim.lsp.util.make_range_params()
-  local ctx = { bufnr = bufnr, method = method, params = params }
-  params.context = { diagnostics = diagnostics }
-  vim.lsp.buf_request_all(bufnr, method, params, cb(ctx))
+  args.params.context = args.context
+    or { diagnostics = vim.diagnostic.get(bufnr, { lnum = vim.api.nvim_win_get_cursor(winid)[1] - 1 }) }
+  vim.lsp.buf_request_all(bufnr, method, args.params, args.cb { bufnr = bufnr, method = method, params = args.params })
 end
 
 local execute = function(client, action, ctx)

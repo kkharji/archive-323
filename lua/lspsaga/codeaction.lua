@@ -24,8 +24,8 @@ M.code_action = function()
     return
   end
   window.bufnr = vim.fn.bufnr()
-  api.code_action_request(function(_, _)
-    return window.open
+  api.code_action_request(function(ctx)
+    return window.prepare(ctx)
   end)
 end
 

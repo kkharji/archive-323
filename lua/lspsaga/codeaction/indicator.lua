@@ -72,10 +72,20 @@ M.check = function()
     window[winid] = window[winid] or {}
     window[winid].lightbulb_line = window[winid].lightbulb_line or 0
 
-    api.code_action_request(function(line, diagnostics)
-      local fail_to_have_diagnostics = M.require_diagnostics[vim.bo.filetype] and next(diagnostics) == nil
-      return function(_, result, _, _)
-        local no_action = result == nil or type(result) ~= "table" or vim.tbl_isempty(result)
+    api.code_action_request(function(ctx)
+      local line = ctx.params.range.start.line
+      local fail_to_have_diagnostics = M.require_diagnostics[vim.bo.filetype] and next(ctx.params.diagnostics) == nil
+      local no_action = true
+
+      return function(res)
+        for _, result in pairs(res) do
+          if result.result and next(result.result) ~= nil then
+            print "has actions"
+            no_action = false
+            break
+          end
+        end
+
         if no_action or fail_to_have_diagnostics then
           return M.update(winid, nil)
         else

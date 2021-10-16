@@ -1,9 +1,5 @@
 local M = {}
 
-M.is_command = function(action)
-  return type(action.command) == "table"
-end
-
 M.code_action_request = function(cb, winid)
   winid = winid or vim.api.nvim_get_current_win()
   local bufnr = vim.api.nvim_get_current_buf()
@@ -16,7 +12,7 @@ M.code_action_request = function(cb, winid)
 end
 
 local execute = function(client, action, ctx)
-  if type(action.edit) == "table" then
+  if action.edit then
     vim.lsp.util.apply_workspace_edit(action.edit)
   end
 
@@ -33,27 +29,23 @@ local execute = function(client, action, ctx)
   end
 end
 
-local resolve = function(client, action, ctx)
+M.code_action_execute = function(client_id, action, ctx)
+  local client = vim.lsp.get_client_by_id(client_id)
   if
-    client
+    not action.edit
+    and client
     and type(client.resolved_capabilities.code_action) == "table"
     and client.resolved_capabilities.code_action.resolveProvider
   then
-    client.request(0, "codeAction/resolve", action, function(err, resolved_action)
+    client.request("codeAction/resolve", action, function(err, resolved_action)
       if err then
         vim.notify(err.code .. ": " .. err.message, vim.log.levels.ERROR)
         return
       end
       execute(client, resolved_action, ctx)
     end)
-  end
-end
-
-M.code_action_execute = function(client_id, action, ctx)
-  local client = vim.lsp.get_client_by_id(client_id)
-  if not execute(client, action, ctx) then
-    print "not found"
-    resolve(client_id, action, ctx)
+  else
+    execute(client, action, ctx)
   end
 end
 

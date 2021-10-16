@@ -14,25 +14,6 @@ local M = {
   content = {},
 }
 
--- if M.actions and next(M.actions) ~= nil then
---   local other_actions = actions_from_other_servers(response)
---   if next(other_actions) ~= nil then
---     vim.tbl_extend("force", M.actions, other_actions)
---   end
---   vim.api.nvim_buf_set_option(M.action_bufnr, "modifiable", true)
---   vim.fn.append(vim.fn.line "$", other_actions)
---   vim.cmd("resize " .. #M.actions + 2)
---   for i, _ in pairs(other_actions) do
---     vim.fn.matchadd("LspSagaCodeActionContent", "\\%" .. #M.actions + 1 + i .. "l")
---   end
--- else
---   M.actions = response
---   for index, action in pairs(response) do
---     local action_title = "[" .. index .. "]" .. " " .. action.title
---     table.insert(M.content, action_title)
---   end
--- end
-
 M.__index = M
 
 M.create_window = function(opts)
@@ -51,7 +32,7 @@ end
 
 M.setup_actions = function(response)
   for client_id, result in pairs(response or {}) do
-    for index, action in pairs(result.result or {}) do
+    for index, action in ipairs(result.result or {}) do
       table.insert(M.actions, { client_id, action })
       table.insert(M.content, "[" .. index .. "]" .. " " .. action.title)
     end
@@ -72,12 +53,12 @@ M.attach_mappings = function()
   end
 end
 
-M.prepare = function(_, ctx)
+M.prepare = function(ctx)
   M.current_ctx = ctx
   return M.open
 end
 
-M.open = function(_, response)
+M.open = function(response)
   M.content = {
     M.title,
   }

@@ -80,7 +80,6 @@ M.check = function()
       return function(res)
         for _, result in pairs(res) do
           if result.result and next(result.result) ~= nil then
-            print "has actions"
             no_action = false
             break
           end

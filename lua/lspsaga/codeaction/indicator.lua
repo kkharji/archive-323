@@ -4,7 +4,7 @@ local config = _config.code_action_prompt
 local icon = _config.code_action_icon
 local libs = require "lspsaga.libs"
 local window = require "lspsaga.codeaction.window"
-local api = require "lspsaga.codeaction.api"
+local api = require "lspsaga.api"
 
 M.group = "sagalightbulb"
 M.sign_name = "LspSagaLightBulb"
@@ -62,17 +62,18 @@ M.update = function(winid, line)
 end
 
 M.check = function()
-  vim.schedule(function()
-    local active, _ = libs.check_lsp_active()
-    if M.special_buffers[vim.bo.filetype] or not active then
-      return
-    end
+  local active, _ = libs.check_lsp_active()
+  if M.special_buffers[vim.bo.filetype] or not active then
+    return
+  end
 
-    local winid = vim.api.nvim_get_current_win()
-    window[winid] = window[winid] or {}
-    window[winid].lightbulb_line = window[winid].lightbulb_line or 0
+  local winid = vim.api.nvim_get_current_win()
+  window[winid] = window[winid] or {}
+  window[winid].lightbulb_line = window[winid].lightbulb_line or 0
 
-    api.code_action_request(function(ctx)
+  api.code_action_request {
+    params = vim.lsp.util.make_range_params(),
+    callback = function(ctx)
       local line = ctx.params.range.start.line
       local fail_to_have_diagnostics = M.require_diagnostics[vim.bo.filetype] and next(ctx.params.diagnostics) == nil
       local no_action = true
@@ -91,8 +92,9 @@ M.check = function()
           return M.update(winid, line)
         end
       end
-    end, winid)
-  end)
+    end,
+    winid = winid,
+  }
 end
 
 M.attach = function()

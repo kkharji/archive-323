@@ -3,7 +3,7 @@ local wrap = require "lspsaga.wrap"
 local window = require "lspsaga.window"
 local libs = require "lspsaga.libs"
 local apply_keys = libs.apply_keys "codeaction.window"
-local api = require "lspsaga.codeaction.api"
+local api = require "lspsaga.api"
 
 local M = {
   title = config.code_action_icon .. "CodeActions:",
@@ -54,6 +54,7 @@ M.attach_mappings = function()
 end
 
 M.prepare = function(ctx)
+  M.bufnr = vim.fn.bufnr()
   M.current_ctx = ctx
   return M.open
 end

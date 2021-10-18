@@ -1,6 +1,7 @@
 local config = require("lspsaga").config_values
 local window = require "lspsaga.window"
 local libs = require "lspsaga.libs"
+local fmt = string.format
 
 local api = require "lspsaga.api"
 local M = { title = config.code_action_icon .. "CodeActions:" }
@@ -25,6 +26,15 @@ M.open = function(opts)
     hl(M.action_bufnr, -1, "LspSagaCodeActionContent", 1 + i, 0, -1)
   end
   M.apply_keys()
+  for index, _ in ipairs(M.content) do
+    vim.api.nvim_buf_set_keymap(
+      M.action_bufnr,
+      "n",
+      tostring(index),
+      fmt("<cmd>lua require'lspsaga.codeaction.window'.execute_an_index(%d)<cr>", index),
+      { noremap = true, silent = true }
+    )
+  end
 end
 
 M.set_cursor = function()
@@ -54,6 +64,15 @@ M.execute = function()
     local client_id, action = choice[1], choice[2]
     api.code_action_execute(client_id, action, M.ctx)
     return
+  end
+  M.close()
+end
+
+M.execute_an_index = function(index)
+  local choice = M.actions[index]
+  if choice then
+    local client_id, action = choice[1], choice[2]
+    api.code_action_execute(client_id, action, M.ctx)
   end
   M.close()
 end

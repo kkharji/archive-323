@@ -40,6 +40,7 @@ saga.config_values = {
   border_style = "single",
   rename_prompt_prefix = "➤",
   server_filetype_map = {},
+  prefix_diagnostic = true,
 }
 
 local extend_config = function(opts)

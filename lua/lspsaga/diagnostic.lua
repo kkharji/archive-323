@@ -93,7 +93,7 @@ local function show_diagnostics(opts, get_diagnostics)
   local sorted_diagnostics = severity_sort and table.sort(diagnostics, comp_severity_asc) or diagnostics
 
   for i, diagnostic in ipairs(sorted_diagnostics) do
-    local prefix = string.format("%d. ", i)
+    local prefix = config.prefix_diagnostic and string.format("%d. ", i) or ""
     local hiname = diagnostic_highlights[diagnostic.severity]
       or lsp.diagnostic._get_floating_severity_highlight_name(diagnostic.severity)
     assert(hiname, "unknown severity: " .. tostring(diagnostic.severity))
@@ -114,8 +114,10 @@ local function show_diagnostics(opts, get_diagnostics)
     fill = true,
     pad_left = 3,
   })
-  local truncate_line = wrap.add_truncate_line(wrap_message)
-  table.insert(wrap_message, 2, truncate_line)
+  if show_header then
+    local truncate_line = wrap.add_truncate_line(wrap_message)
+    table.insert(wrap_message, 2, truncate_line)
+  end
 
   local content_opts = {
     contents = wrap_message,

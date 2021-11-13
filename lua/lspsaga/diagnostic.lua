@@ -59,7 +59,7 @@ local show_diagnostics = function(opts, get_diagnostics)
   end
 
   for i, diagnostic in ipairs(diagnostics) do
-    local prefix = config.prefix_diagnostic and string.format("%d. ", i) or ""  
+    local prefix = string.format(config.diagnostic_prefix_format, i)
     local hiname = M.highlights[diagnostic.severity]
     assert(hiname, "unknown severity: " .. tostring(diagnostic.severity))
 

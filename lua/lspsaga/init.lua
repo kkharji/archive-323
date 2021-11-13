@@ -42,7 +42,7 @@ saga.config_values = {
   border_style = "single",
   rename_prompt_prefix = "➤",
   server_filetype_map = {},
-  prefix_diagnostic = true,
+  diagnostic_prefix_format = "%d. ",
 }
 
 saga.config_values.dianostic_header_icon = saga.config_values.diagnostic_header_icon

@@ -53,6 +53,7 @@ local saga = require 'lspsaga'
 -- the related filetypes into this table
 -- like server_filetype_map = {metals = {'sbt', 'scala'}}
 -- server_filetype_map = {}
+-- diagnostic_prefix_format = "%d. "
 
 saga.init_lsp_saga {
   your custom option here

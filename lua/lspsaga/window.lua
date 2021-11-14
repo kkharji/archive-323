@@ -57,6 +57,7 @@ local function make_floating_popup_options(width, height, opts)
   new_option.style = "minimal"
   new_option.width = width
   new_option.height = height
+  new_option.border = opts.border
 
   if opts.relative ~= nil then
     new_option.relative = opts.relative
@@ -148,8 +149,8 @@ function M.create_win_with_border(content_opts, opts)
   local enter = content_opts.enter or false
   local highlight = content_opts.highlight or "LspFloatWinBorder"
   opts = opts or {}
-  opts = generate_win_opts(contents, opts)
-  opts.border = get_border_style(config.border_style, highlight)
+  local newopts = generate_win_opts(contents, opts)
+  newopts.border = opts.border or get_border_style(opts.border_style or config.border_style, highlight)
 
   -- create contents buffer
   local bufnr = api.nvim_create_buf(false, true)
@@ -166,7 +167,7 @@ function M.create_win_with_border(content_opts, opts)
   api.nvim_buf_set_option(bufnr, "bufhidden", "wipe")
   api.nvim_buf_set_option(bufnr, "buftype", "nofile")
 
-  local winid = api.nvim_open_win(bufnr, enter, opts)
+  local winid = api.nvim_open_win(bufnr, enter, newopts)
   if filetype == "markdown" then
     api.nvim_win_set_option(winid, "conceallevel", 2)
   end

@@ -13,13 +13,13 @@ TODO .......
 ### Packer
 
 ```lua
-use { 'tami5/lspsaga.nvim' } 
+use { 'tami5/lspsaga.nvim' }  -- nightly 
+use { 'tami5/lspsaga.nvim', branch = 'nvim6.0' or 'nvim51' } -- for specific version
 ```
 
 ## Requirements
 
 - neovim/nvim-lspconfig
-- NEOVIM NIGHTLY (`+v0.6.0-dev+1865-g3beea1fe1`) or use nvim51 branch `use { 'tami5/lspsaga.nvim', branch = 'nvim51' } `
 
 ## Setup
 

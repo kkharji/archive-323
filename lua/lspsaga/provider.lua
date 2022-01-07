@@ -197,9 +197,9 @@ function Finder:render_finder_result()
   }
 
   self.bufnr, self.winid = window.create_win_with_border(content_opts, opts)
-  api.nvim_buf_set_option(self.contents_buf, "buflisted", false)
-  api.nvim_win_set_var(self.conents_win, "lsp_finder_win_opts", opts)
-  api.nvim_win_set_option(self.conents_win, "cursorline", true)
+  api.nvim_buf_set_option(self.contents_buf or 0, "buflisted", false)
+  api.nvim_win_set_var(self.conents_win or 0, "lsp_finder_win_opts", opts)
+  api.nvim_win_set_option(self.conents_win or 0, "cursorline", true)
 
   if not self.cursor_line_bg and not self.cursor_line_fg then
     self:get_cursorline_highlight()
@@ -210,12 +210,12 @@ function Finder:render_finder_result()
   api.nvim_command "autocmd QuitPre <buffer> lua require('lspsaga.provider').close_lsp_finder_window()"
 
   for i = 1, self.definition_uri, 1 do
-    api.nvim_buf_add_highlight(self.contents_buf, -1, "TargetFileName", 1 + i, 0, -1)
+    api.nvim_buf_add_highlight(self.contents_buf or 0, -1, "TargetFileName", 1 + i, 0, -1)
   end
 
   for i = 1, self.reference_uri, 1 do
     local def_count = self.definition_uri ~= 0 and self.definition_uri or -1
-    api.nvim_buf_add_highlight(self.contents_buf, -1, "TargetFileName", i + def_count + 4, 0, -1)
+    api.nvim_buf_add_highlight(self.contents_buf or 0, -1, "TargetFileName", i + def_count + 4, 0, -1)
   end
   -- load float window map
   self:apply_float_map()
@@ -262,19 +262,19 @@ function Finder:lsp_finder_highlight()
   local ref_icon = config.finder_reference_icon or ""
   local def_uri_count = self.definition_uri == 0 and -1 or self.definition_uri
   -- add syntax
-  api.nvim_buf_add_highlight(self.contents_buf, -1, "DefinitionIcon", 0, 1, #def_icon - 1)
-  api.nvim_buf_add_highlight(self.contents_buf, -1, "TargetWord", 0, #def_icon, self.param_length + #def_icon + 3)
-  api.nvim_buf_add_highlight(self.contents_buf, -1, "DefinitionCount", 0, 0, -1)
+  api.nvim_buf_add_highlight(self.contents_buf or 0, -1, "DefinitionIcon", 0, 1, #def_icon - 1)
+  api.nvim_buf_add_highlight(self.contents_buf or 0, -1, "TargetWord", 0, #def_icon, self.param_length + #def_icon + 3)
+  api.nvim_buf_add_highlight(self.contents_buf or 0, -1, "DefinitionCount", 0, 0, -1)
   api.nvim_buf_add_highlight(
-    self.contents_buf,
+    self.contents_buf or 0,
     -1,
     "TargetWord",
     3 + def_uri_count,
     #ref_icon,
     self.param_length + #ref_icon + 3
   )
-  api.nvim_buf_add_highlight(self.contents_buf, -1, "ReferencesIcon", 3 + def_uri_count, 1, #ref_icon + 4)
-  api.nvim_buf_add_highlight(self.contents_buf, -1, "ReferencesCount", 3 + def_uri_count, 0, -1)
+  api.nvim_buf_add_highlight(self.contents_buf or 0, -1, "ReferencesIcon", 3 + def_uri_count, 1, #ref_icon + 4)
+  api.nvim_buf_add_highlight(self.contents_buf or 0, -1, "ReferencesCount", 3 + def_uri_count, 0, -1)
 end
 
 function Finder:set_cursor()

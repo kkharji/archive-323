@@ -138,7 +138,10 @@ end
 
 M.show_line_diagnostics = function(opts, lnum, bufnr)
   return show_diagnostics(opts or {}, function()
-    return vim.diagnostic.get(bufnr, { lnum = lnum or (vim.api.nvim_win_get_cursor(0)[1] - 1) })
+    local buf = bufnr or vim.api.nvim_get_current_buf()
+    local line_num = lnum or (vim.api.nvim_win_get_cursor(0)[1] - 1)
+
+    return vim.diagnostic.get(buf, { lnum = line_num  })
   end)
 end
 

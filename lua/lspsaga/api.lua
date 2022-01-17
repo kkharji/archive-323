@@ -13,7 +13,7 @@ end
 
 local execute = function(client, action, ctx)
   if action.edit then
-    vim.lsp.util.apply_workspace_edit(action.edit)
+    vim.lsp.util.apply_workspace_edit(action.edit, client.offset_encoding)
   end
 
   if action.command then

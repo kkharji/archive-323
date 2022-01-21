@@ -28,7 +28,7 @@ local show_diagnostics = function(opts, get_diagnostics)
   if not active then
     return
   end
-  local max_width = window.get_max_float_width()
+  local max_width = window.get_max_float_width() - 2
 
   -- if there already has diagnostic float window did not show show lines diagnostic window
   local has_var, diag_float_winid = pcall(vim.api.nvim_buf_get_var, 0, "diagnostic_float_window")
@@ -43,6 +43,7 @@ local show_diagnostics = function(opts, get_diagnostics)
 
   local lines = {}
   local highlights = {}
+
   if show_header then
     lines[1] = config.diagnostic_header_icon .. "Diagnostics:"
     highlights[1] = { 0, "LspSagaDiagnosticHeader" }
@@ -58,45 +59,55 @@ local show_diagnostics = function(opts, get_diagnostics)
     end)
   end
 
+  local signs = {
+    config.error_sign,
+    config.warn_sign,
+    config.infor_sign,
+    config.hint_sign
+  }
+
   for i, diagnostic in ipairs(diagnostics) do
-    local prefix = string.format(config.diagnostic_prefix_format, i)
     local hiname = M.highlights[diagnostic.severity]
     assert(hiname, "unknown severity: " .. tostring(diagnostic.severity))
 
+    local prefix = string.gsub(config.diagnostic_prefix_format, '%%s', signs[diagnostic.severity])
+    prefix = string.format(prefix, i)
+
     local message_lines = vim.split(diagnostic.message, "\n", true)
-    table.insert(lines, prefix .. message_lines[1])
-    table.insert(highlights, { #prefix + 1, hiname })
-    if #message_lines[1] + 4 > max_width then
-      table.insert(highlights, { #prefix + 1, hiname })
-    end
+    message_lines[1] = prefix .. message_lines[1]
     for j = 2, #message_lines do
-      table.insert(lines, "   " .. message_lines[j])
-      table.insert(highlights, { 0, hiname })
+        message_lines[j] = string.rep(' ', #prefix) .. message_lines[j]
+    end
+    wrap_message = wrap.wrap_contents(message_lines, max_width, { fill = true, pad_left = #prefix })
+
+    for j = 1, #wrap_message do
+      table.insert(lines, wrap_message[j])
+
+      if not config.highlight_prefix then
+        table.insert(highlights, { #prefix, hiname })
+      else
+        table.insert(highlights, { 0, hiname })
+      end
     end
   end
 
-  local wrap_message = wrap.wrap_contents(lines, max_width, { fill = true, pad_left = 3 })
   if show_header then
-    local truncate_line = wrap.add_truncate_line(wrap_message)
-    table.insert(wrap_message, 2, truncate_line)
+    local truncate_line = wrap.add_truncate_line(lines)
+    table.insert(lines, 2, truncate_line)
+    table.insert(highlights, 2, { 0, 'LspSagaDiagnosticTruncateLine' })
   end
 
-  local content_opts = { contents = wrap_message, filetype = "plaintext", highlight = "LspSagaDiagnosticBorder" }
+  local content_opts = { contents = lines, filetype = "plaintext", highlight = "LspSagaDiagnosticBorder" }
   local bufnr, winid = window.create_win_with_border(content_opts, opts)
 
   for i, hi in ipairs(highlights) do
-    local _, hiname = unpack(hi)
-    -- Start highlight after the prefix
-    if i == 1 then
-      vim.api.nvim_buf_add_highlight(bufnr, -1, hiname, 0, 0, -1)
-    else
-      vim.api.nvim_buf_add_highlight(bufnr, -1, hiname, i, 3, -1)
-    end
+    local prefix, hiname = unpack(hi)
+    vim.api.nvim_buf_add_highlight(bufnr, -1, hiname, i - 1, prefix, -1)
   end
 
-  vim.api.nvim_buf_add_highlight(bufnr, -1, "LspSagaDiagnosticTruncateLine", 1, 0, -1)
   libs.close_preview_autocmd({ "CursorMoved", "CursorMovedI", "BufHidden", "BufLeave" }, winid)
   vim.api.nvim_win_set_var(0, "show_line_diag_winids", winid)
+  vim.api.nvim_win_set_option(winid, "wrap", false)
 
   return winid
 end

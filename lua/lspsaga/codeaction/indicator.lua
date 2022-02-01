@@ -64,15 +64,23 @@ end
 M.check = function()
   local active, _ = libs.check_lsp_active()
   local current_file = vim.fn.expand "%:p"
+  local fb = vim.bo.filetype
 
   if M.servers[current_file] == nil then
     local clients = vim.lsp.get_active_clients()
+
     for _, client in ipairs(clients) do
-      if client.resolved_capabilities.code_action then
+      if
+        client
+        and vim.tbl_contains(client.config.filetypes, fb)
+        and client.resolved_capabilities.code_action
+        and client.supports_method "code_action"
+      then
         M.servers[current_file] = true
         break
       end
     end
+
     if M.servers[current_file] == nil then
       M.servers[current_file] = false
     end

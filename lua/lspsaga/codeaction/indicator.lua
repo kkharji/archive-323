@@ -98,7 +98,7 @@ M.check = function()
     params = vim.lsp.util.make_range_params(),
     callback = function(ctx)
       local line = ctx.params.range.start.line
-      local fail_to_have_diagnostics = M.require_diagnostics[vim.bo.filetype] and next(ctx.params.diagnostics) == nil
+      local fail_to_have_diagnostics = M.require_diagnostics[vim.bo.filetype] and ctx.params.diagnostics and next(ctx.params.diagnostics) == nil
       local no_action = true
 
       return function(res)

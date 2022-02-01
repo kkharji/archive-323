@@ -44,6 +44,7 @@ saga.config_values = {
   rename_prompt_prefix = "➤",
   server_filetype_map = {},
   diagnostic_prefix_format = "%d. ",
+  highlight_prefix = false,
 }
 
 saga.config_values.dianostic_header_icon = saga.config_values.diagnostic_header_icon

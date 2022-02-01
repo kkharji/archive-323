@@ -10,10 +10,12 @@ local on_code_action_response = function(ctx)
   window.content, window.actions = { window.title }, {}
 
   return function(response)
+    local actionNum = 1
     for client_id, result in pairs(response or {}) do
-      for index, action in ipairs(result.result or {}) do
+      for _, action in ipairs(result.result or {}) do
         table.insert(window.actions, { client_id, action })
-        table.insert(window.content, "[" .. index .. "]" .. " " .. action.title)
+        table.insert(window.content, "[" .. actionNum .. "]" .. " " .. action.title)
+        actionNum = actionNum + 1
       end
     end
 

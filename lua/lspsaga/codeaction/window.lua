@@ -9,6 +9,15 @@ M.apply_keys = function()
   libs.apply_keys("codeaction.window", {
     ["close"] = config.code_action_keys.quit,
     ["execute"] = config.code_action_keys.exec,
+    ["execute_one"] = '1',
+    ["execute_two"] = '2',
+    ["execute_three"] = '3',
+    ["execute_four"] = '4',
+    ["execute_five"] = '5',
+    ["execute_six"] = '6',
+    ["execute_seven"] = '7',
+    ["execute_eight"] = '8',
+    ["execute_nine"] = '9',
   })
 end
 
@@ -47,8 +56,8 @@ M.close = function()
   end
 end
 
-M.execute = function()
-  local choice = M.actions[tonumber(vim.fn.expand "<cword>")]
+M.execute = function(choice_num)
+  local choice = M.actions[choice_num or tonumber(vim.fn.expand "<cword>")]
   if choice then
     M.close()
     local client_id, action = choice[1], choice[2]
@@ -57,5 +66,15 @@ M.execute = function()
   end
   M.close()
 end
+
+M.execute_one = function() M.execute(1) end
+M.execute_two = function() M.execute(2) end
+M.execute_three = function() M.execute(3) end
+M.execute_four = function() M.execute(4) end
+M.execute_five = function() M.execute(5) end
+M.execute_six = function() M.execute(6) end
+M.execute_seven = function() M.execute(7) end
+M.execute_eight = function() M.execute(8) end
+M.execute_nine = function() M.execute(9) end
 
 return M

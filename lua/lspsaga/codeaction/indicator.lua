@@ -68,7 +68,7 @@ M.check = function()
   if M.servers[current_file] == nil then
     local clients = vim.lsp.get_active_clients()
     for _, client in ipairs(clients) do
-      if client.resolved_capabilities.code_actions then
+      if client.resolved_capabilities.code_action then
         M.servers[current_file] = true
         break
       end

@@ -72,6 +72,7 @@ M.check = function()
     for _, client in ipairs(clients) do
       if
         client
+        and client.config.filetypes
         and vim.tbl_contains(client.config.filetypes, fb)
         and client.resolved_capabilities.code_action
         and client.supports_method "code_action"

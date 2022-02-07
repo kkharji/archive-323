@@ -59,7 +59,7 @@ local rename = function()
 
   local content_opts = {
     contents = {},
-    filetype = "LspSagaRename",
+    filetype = "LspsagaRename",
     enter = true,
     highlight = "LspSagaRenameBorder",
   }

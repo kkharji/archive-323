@@ -71,9 +71,19 @@ local show_diagnostics = function(opts, get_diagnostics)
     assert(hiname, "unknown severity: " .. tostring(diagnostic.severity))
 
     local prefix = string.gsub(config.diagnostic_prefix_format, '%%s', signs[diagnostic.severity])
-    prefix = string.format(prefix, i)
+    prefix = string.gsub(prefix, '%%d', i)
 
-    local message_lines = vim.split(diagnostic.message, "\n", true)
+    local message = string.gsub(config.diagnostic_message_format, '%%m', diagnostic.message)
+
+    if diagnostic.user_data and diagnostic.user_data.lsp and diagnostic.user_data.lsp.code then
+        message = string.gsub(message, '%%c', '[' .. diagnostic.user_data.lsp.code .. ']')
+    else
+        message = string.gsub(message, '%%c', '')
+    end
+
+    message = vim.fn.trim(message)
+
+    local message_lines = vim.split(message, "\n", true)
     message_lines[1] = prefix .. message_lines[1]
     for j = 2, #message_lines do
         message_lines[j] = string.rep(' ', #prefix) .. message_lines[j]

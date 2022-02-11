@@ -6,14 +6,6 @@ local wrap = require "lspsaga.wrap"
 local libs = require "lspsaga.libs"
 local action = require "lspsaga.action"
 
-local function find_window_by_var(name, value)
-  for _, win in ipairs(api.nvim_list_wins()) do
-    if npcall(api.nvim_win_get_var, win, name) == value then
-      return win
-    end
-  end
-end
-
 -- disable signature help when only efm-langserver
 -- issue #103
 local function check_server_support_signaturehelp()
@@ -31,27 +23,6 @@ local function check_server_support_signaturehelp()
   return false
 end
 
-local function focusable_float(unique_name, fn)
-  -- Go back to previous window if we are in a focusable one
-  if npcall(api.nvim_win_get_var, 0, unique_name) then
-    return api.nvim_command "wincmd p"
-  end
-  local bufnr = api.nvim_get_current_buf()
-  do
-    local win = find_window_by_var(unique_name, bufnr)
-    if win and api.nvim_win_is_valid(win) and not vim.fn.pumvisible() then
-      api.nvim_set_current_win(win)
-      api.nvim_command "stopinsert"
-      return
-    end
-  end
-  local pbufnr, pwinnr, _, _ = fn()
-  if pbufnr then
-    api.nvim_win_set_var(pwinnr, unique_name, bufnr)
-    return pbufnr, pwinnr
-  end
-end
-
 local function apply_syntax_to_region(ft, start, finish)
   if ft == "" then
     return
@@ -66,7 +37,7 @@ local function apply_syntax_to_region(ft, start, finish)
 end
 
 local function focusable_preview(unique_name, fn)
-  return focusable_float(unique_name, function()
+  return libs.focusable_float(unique_name, function()
     local contents, _ = fn()
     local filetype = api.nvim_buf_get_option(0, "filetype")
     vim.validate { contents = { contents, "t" }, filetype = { filetype, "s", true } }

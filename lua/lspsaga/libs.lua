@@ -1,4 +1,5 @@
 local api = vim.api
+local npcall = vim.F.npcall
 local libs = {}
 local server_filetype_map = require("lspsaga").config_values.server_filetype_map
 
@@ -152,5 +153,35 @@ function libs.close_preview_autocmd(events, winid)
   local cmd = string.format('autocmd %s <buffer> ++once lua pcall(vim.api.nvim_win_close, %d, true)', events_str, winid)
   vim.api.nvim_command(cmd)
 end
+
+local function find_window_by_var(name, value)
+  for _, win in ipairs(api.nvim_list_wins()) do
+    if npcall(api.nvim_win_get_var, win, name) == value then
+      return win
+    end
+  end
+end
+
+function libs.focusable_float(unique_name, fn)
+  -- Go back to previous window if we are in a focusable one
+  if npcall(api.nvim_win_get_var, 0, unique_name) then
+    return api.nvim_command "wincmd p"
+  end
+  local bufnr = api.nvim_get_current_buf()
+  do
+    local win = find_window_by_var(unique_name, bufnr)
+    if win and api.nvim_win_is_valid(win) and vim.fn.pumvisible() == 0 then
+      api.nvim_set_current_win(win)
+      api.nvim_command "stopinsert"
+      return
+    end
+  end
+  local pbufnr, pwinnr, _, _ = fn()
+  if pbufnr then
+    api.nvim_win_set_var(pwinnr, unique_name, bufnr)
+    return pbufnr, pwinnr
+  end
+end
+
 
 return libs

@@ -64,6 +64,7 @@ end
 M.check = function()
   local active, _ = libs.check_lsp_active()
   local current_file = vim.fn.expand "%:p"
+  local is_file = vim.loop.fs_stat(current_file) ~= nil
   local fb = vim.bo.filetype
 
   if M.servers[current_file] == nil then
@@ -71,7 +72,8 @@ M.check = function()
 
     for _, client in ipairs(clients) do
       if
-        client
+        is_file
+        and client
         and client.config.filetypes
         and vim.tbl_contains(client.config.filetypes, fb)
         and client.resolved_capabilities.code_action

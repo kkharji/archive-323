@@ -68,6 +68,8 @@ lspsaga.setup { -- defaults ...
   rename_prompt_prefix = "➤",
   server_filetype_map = {},
   diagnostic_prefix_format = "%d. ",
+  diagnostic_message_format = "%m %c",
+  highlight_prefix = false,
 }
 ```
 ## Example Keymapings

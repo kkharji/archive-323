@@ -116,7 +116,7 @@ local rename_handler = function(_, result, ctx, _)
     if #locations == 0 then
       return
     else
-      vim.fn.setqflist(vim.lsp.util.locations_to_items(locations, offset_encoding))
+      vim.fn.setqflist(vim.lsp.util.locations_to_items(locations, offset_encoding), ' ')
     end
   end
 end

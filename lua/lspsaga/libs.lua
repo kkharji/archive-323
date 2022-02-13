@@ -172,6 +172,8 @@ function libs.focusable_float(unique_name, fn)
     local win = find_window_by_var(unique_name, bufnr)
     if win and api.nvim_win_is_valid(win) and vim.fn.pumvisible() == 0 then
       api.nvim_set_current_win(win)
+      api.nvim_buf_set_keymap(0, "n", "<Esc>", "<cmd>close!<cr>", {nowait = true, silent = true, noremap = true})
+      api.nvim_buf_set_keymap(0, "n", "<C-c>", "<cmd>close!<cr>", {nowait = true, silent = true, noremap = true})
       api.nvim_command "stopinsert"
       return
     end

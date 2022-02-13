@@ -85,7 +85,7 @@ local function focusable_preview(unique_name, fn)
     api.nvim_set_current_win(winid)
     apply_syntax_to_region(filetype, 1, wrap_index)
     api.nvim_set_current_win(cwin)
-    libs.close_preview_autocmd({ "CursorMoved", "CursorMovedI", "BufHidden", "BufLeave" }, winid)
+    libs.close_preview_autocmd({ "CursorMoved", "CursorMovedI", "BufHidden" }, winid)
     return bufnr, winid
   end)
 end

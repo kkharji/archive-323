@@ -110,13 +110,16 @@ local rename_handler = function(_, result, ctx, _)
   local client = vim.lsp.get_client_by_id(ctx.client_id)
   util.apply_workspace_edit(result, client.offset_encoding)
 
-  if config.rename_output_qflist then
+  if config.rename_output_qflist.enable then
     local offset_encoding = vim.lsp.get_client_by_id(ctx.client_id).offset_encoding
     local locations = workspaceedit_changes_to_location_list(result.changes)
     if #locations == 0 then
       return
     else
       vim.fn.setqflist(vim.lsp.util.locations_to_items(locations, offset_encoding), ' ')
+      if config.rename_output_qflist.auto_open_qflist then
+        vim.cmd "copen"
+      end
     end
   end
 end

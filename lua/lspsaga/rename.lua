@@ -86,6 +86,41 @@ local rename = function()
   apply_action_keys()
 end
 
+--- WorkspaceEdit -> Location[]
+---@param changes table
+---@return table
+local workspaceedit_changes_to_location_list = function(changes)
+  local result = {}
+
+  for uri, text_edits in pairs(changes) do
+    for _, text_edit in ipairs(text_edits) do
+      table.insert(result, {
+        uri = uri,
+        range = text_edit.range
+      })
+    end
+  end
+
+  return result
+end
+
+local rename_handler = function(_, result, ctx, _)
+  -- source: vim.lsp.handlers['textDocument/rename']
+  if not result then return end
+  local client = vim.lsp.get_client_by_id(ctx.client_id)
+  util.apply_workspace_edit(result, client.offset_encoding)
+
+  if config.rename_output_qflist then
+    local offset_encoding = vim.lsp.get_client_by_id(ctx.client_id).offset_encoding
+    local locations = workspaceedit_changes_to_location_list(result.changes)
+    if #locations == 0 then
+      return
+    else
+      vim.fn.setqflist(vim.lsp.util.locations_to_items(locations, offset_encoding))
+    end
+  end
+end
+
 local do_rename = function()
   local prompt_prefix = get_prompt_prefix()
   local new_name = vim.trim(vim.fn.getline("."):sub(#prompt_prefix + 1, -1))
@@ -96,7 +131,7 @@ local do_rename = function()
     return
   end
   params.newName = new_name
-  lsp.buf_request(0, "textDocument/rename", params)
+  lsp.buf_request(0, "textDocument/rename", params, rename_handler)
 end
 
 return {

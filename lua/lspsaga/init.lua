@@ -39,6 +39,7 @@ saga.config_values = {
     exec = "<CR>",
   },
   rename_prompt_populate = true,
+  rename_output_qflist = false,
   definition_preview_icon = "  ",
   border_style = "single",
   rename_prompt_prefix = "➤",

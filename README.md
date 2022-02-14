@@ -82,8 +82,8 @@ lspsaga.setup { -- defaults ...
 --- In lsp attach function
 local map = nvim_buf_set_keymap,
 map(0, "n", "gr", "<cmd>Lspsaga rename<cr>", {silent = true, noremap = true})
-map(0, "n", "gx", "<cmd>Lspsaga code_action<cr>", {silent = true, noremap = true})
-map(0, "x", "gx", ":<c-u>Lspsaga range_code_action<cr>", {silent = true, noremap = true})
+map(0, "n", "gX", "<cmd>Lspsaga code_action<cr>", {silent = true, noremap = true})
+map(0, "x", "gX", ":<c-u>Lspsaga range_code_action<cr>", {silent = true, noremap = true})
 map(0, "n", "K",  "<cmd>Lspsaga hover_doc<cr>", {silent = true, noremap = true})
 map(0, "n", "go", "<cmd>Lspsaga show_line_diagnostics<cr>", {silent = true, noremap = true})
 map(0, "n", "gj", "<cmd>Lspsaga diagnostic_jump_next<cr>", {silent = true, noremap = true})

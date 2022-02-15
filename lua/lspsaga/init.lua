@@ -39,11 +39,17 @@ saga.config_values = {
     exec = "<CR>",
   },
   rename_prompt_populate = true,
+  rename_output_qflist = {
+    enable = false,
+    auto_open_qflist = false,
+  },
   definition_preview_icon = "  ",
   border_style = "single",
   rename_prompt_prefix = "➤",
   server_filetype_map = {},
   diagnostic_prefix_format = "%d. ",
+  diagnostic_message_format = "%m %c",
+  highlight_prefix = false,
 }
 
 saga.config_values.dianostic_header_icon = saga.config_values.diagnostic_header_icon

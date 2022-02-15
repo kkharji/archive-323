@@ -64,15 +64,26 @@ end
 M.check = function()
   local active, _ = libs.check_lsp_active()
   local current_file = vim.fn.expand "%:p"
+  local is_file = vim.loop.fs_stat(current_file) ~= nil
+  local fb = vim.bo.filetype
 
   if M.servers[current_file] == nil then
     local clients = vim.lsp.get_active_clients()
+
     for _, client in ipairs(clients) do
-      if client.resolved_capabilities.code_actions then
+      if
+        is_file
+        and client
+        and client.config.filetypes
+        and vim.tbl_contains(client.config.filetypes, fb)
+        and client.resolved_capabilities.code_action
+        and client.supports_method "code_action"
+      then
         M.servers[current_file] = true
         break
       end
     end
+
     if M.servers[current_file] == nil then
       M.servers[current_file] = false
     end
@@ -90,7 +101,7 @@ M.check = function()
     params = vim.lsp.util.make_range_params(),
     callback = function(ctx)
       local line = ctx.params.range.start.line
-      local fail_to_have_diagnostics = M.require_diagnostics[vim.bo.filetype] and next(ctx.params.diagnostics) == nil
+      local fail_to_have_diagnostics = M.require_diagnostics[vim.bo.filetype] and ctx.params.diagnostics and next(ctx.params.diagnostics) == nil
       local no_action = true
 
       return function(res)

@@ -13,13 +13,13 @@ TODO .......
 ### Packer
 
 ```lua
-use { 'tami5/lspsaga.nvim' } 
+use { 'tami5/lspsaga.nvim' }  -- nightly 
+use { 'tami5/lspsaga.nvim', branch = 'nvim6.0' or 'nvim51' } -- for specific version
 ```
 
 ## Requirements
 
 - neovim/nvim-lspconfig
-- NEOVIM NIGHTLY (`+v0.6.0-dev+1865-g3beea1fe1`) or use nvim51 branch `use { 'tami5/lspsaga.nvim', branch = 'nvim51' } `
 
 ## Setup
 
@@ -66,8 +66,14 @@ lspsaga.setup { -- defaults ...
   definition_preview_icon = "  ",
   border_style = "single",
   rename_prompt_prefix = "➤",
+  rename_output_qflist = {
+    enable = false,
+    auto_open_qflist = false,
+  },
   server_filetype_map = {},
   diagnostic_prefix_format = "%d. ",
+  diagnostic_message_format = "%m %c",
+  highlight_prefix = false,
 }
 ```
 ## Example Keymapings

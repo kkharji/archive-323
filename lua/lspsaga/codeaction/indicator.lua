@@ -68,21 +68,20 @@ M.check = function()
   local fb = vim.bo.filetype
 
   if M.servers[current_file] == nil then
-    local clients = vim.lsp.get_active_clients()
-
-    for _, client in ipairs(clients) do
-      if
-        is_file
-        and client
-        and client.config.filetypes
-        and vim.tbl_contains(client.config.filetypes, fb)
-        and client.resolved_capabilities.code_action
-        and client.supports_method "code_action"
-      then
-        M.servers[current_file] = true
-        break
+    vim.lsp.for_each_buffer_client(vim.api.nvim_get_current_buf(), function(client)
+        if M.servers[current_file] then return end
+        if
+          is_file
+          and client
+          and client.config.filetypes
+          and vim.tbl_contains(client.config.filetypes, fb)
+          and client.resolved_capabilities.code_action
+          and client.supports_method "code_action"
+        then
+          M.servers[current_file] = true
+        end
       end
-    end
+    )
 
     if M.servers[current_file] == nil then
       M.servers[current_file] = false

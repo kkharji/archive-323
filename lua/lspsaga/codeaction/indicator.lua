@@ -63,9 +63,12 @@ end
 
 M.check = function()
   local active, _ = libs.check_lsp_active()
-  local current_file = vim.fn.expand "%:p"
-  if vim.loop.fs_stat(current_file) == nil then -- current_file is not a file
-    M.servers[current_file] = false
+  local current_file = vim.api.nvim_buf_get_name(0)
+  local is_file = vim.loop.fs_stat(current_file) ~= nil
+
+  if not active or not is_file or M.special_buffers[vim.bo.filetype] then
+    -- Lsp could become active after some time so we should not
+    -- use `M.server[current_file] = false` here
     return
   end
 
@@ -86,7 +89,7 @@ M.check = function()
     end
   end
 
-  if M.special_buffers[vim.bo.filetype] or not active or M.servers[current_file] == false then
+  if M.servers[current_file] == false then
     return
   end
 

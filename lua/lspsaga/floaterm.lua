@@ -30,7 +30,7 @@ local function open_float_terminal(command, border_style)
 
   local content_opts = {
     contents = {},
-    filetype = "Floaterm",
+    filetype = "LspsagaFloaterm",
     enter = true,
   }
 

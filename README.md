@@ -142,6 +142,26 @@ The available highlight groups are:
 | `LspSagaDefPreviewBorder` | |
 | `LspLinesDiagBorder` | |
 
+## Filetypes
+
+Autocmds can be added for dedicated filetypes of LspSaga floating windows.
+For example, one can use `<Esc>` to close the hover window when jumping into it by calling `:Lspsaga hover_doc` twice.
+```vim
+augroup lspsaga_filetypes
+  autocmd!
+  autocmd FileType LspsagaHover nnoremap <buffer><nowait><silent> <Esc> <cmd>close!<cr>
+augroup END
+```
+
+The available filetypes are:
+* `LspsagaCodeAction`
+* `LspsagaDiagnostic`
+* `LspsagaFinder`
+* `LspsagaFloaterm`
+* `LspsagaHover`
+* `LspsagaRename`
+* `LspsagaSignatureHelp`
+
 # License
 
 MIT

@@ -184,6 +184,15 @@ M.navigate = function(direction)
   end
 end
 
+M.toggle_virtual_text = function()
+  if config.use_diagnostic_virtual_text == true then
+    config.use_diagnostic_virtual_text = false
+  else
+    config.use_diagnostic_virtual_text = true
+  end
+  vim.diagnostic.config({virtual_text = config.use_diagnostic_virtual_text})
+end
+
 --- TODO: at some point just use builtin function to preview diagnostics
 --- Missing borders and formating of title
 -- vim.diagnostic.show_position_diagnostics {

@@ -24,6 +24,7 @@ local subcommands = {
   close_floaterm = floaterm.close_float_terminal,
   toggle_floaterm = floaterm.toggle_float_terminal,
   implement = implement.lspsaga_implementation,
+  toggle_virtual_text = diagnostic.toggle_virtual_text,
 }
 
 function command.command_list()

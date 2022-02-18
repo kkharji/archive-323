@@ -15,6 +15,46 @@ M.highlights = {
   [vim.diagnostic.severity.HINT] = "DiagnosticFloatingHint",
 }
 
+local get_line_diagnostics = function(lnum, bufnr)
+  return function()
+    local buf = bufnr or vim.api.nvim_get_current_buf()
+    local line_num = lnum or (vim.api.nvim_win_get_cursor(0)[1] - 1)
+
+    return vim.diagnostic.get(buf, { lnum = line_num  })
+  end
+end
+
+local format_message = function(diagnostic)
+    local message = string.gsub(config.diagnostic_message_format, '%%m', diagnostic.message)
+
+    if diagnostic.user_data and diagnostic.user_data.lsp and diagnostic.user_data.lsp.code then
+        message = string.gsub(message, '%%c', '[' .. diagnostic.user_data.lsp.code .. ']')
+    else
+        message = string.gsub(message, '%%c', '')
+    end
+
+    return vim.fn.trim(message)
+end
+
+M.yank_line_messages = function(opts, lnum, bufnr)
+  local diagnostics = get_line_diagnostics(lnum, bufnr)()
+  local messages = {}
+  for _, diagnostic in ipairs(diagnostics) do
+    table.insert(messages, format_message(diagnostic))
+  end
+  if #messages == 0 then
+    print('No diagnostics found')
+    return
+  end
+  local reg = opts or '+' -- yank to + by default
+  local message = messages[1]
+  for i = 2, #messages do
+    message = message .. '\n' .. messages[i]
+  end
+  print('Copied to registry ' .. reg)
+  vim.fn.setreg(reg, message)
+end
+
 ---TODO(refactor): move to popup.lua
 local show_diagnostics = function(opts, get_diagnostics)
   local close_hover = opts.close_hover or false
@@ -73,22 +113,14 @@ local show_diagnostics = function(opts, get_diagnostics)
     local prefix = string.gsub(config.diagnostic_prefix_format, '%%s', signs[diagnostic.severity])
     prefix = string.gsub(prefix, '%%d', i)
 
-    local message = string.gsub(config.diagnostic_message_format, '%%m', diagnostic.message)
-
-    if diagnostic.user_data and diagnostic.user_data.lsp and diagnostic.user_data.lsp.code then
-        message = string.gsub(message, '%%c', '[' .. diagnostic.user_data.lsp.code .. ']')
-    else
-        message = string.gsub(message, '%%c', '')
-    end
-
-    message = vim.fn.trim(message)
+    local message = format_message(diagnostic)
 
     local message_lines = vim.split(message, "\n", true)
     message_lines[1] = prefix .. message_lines[1]
     for j = 2, #message_lines do
         message_lines[j] = string.rep(' ', #prefix) .. message_lines[j]
     end
-    wrap_message = wrap.wrap_contents(message_lines, max_width, { fill = true, pad_left = #prefix })
+    local wrap_message = wrap.wrap_contents(message_lines, max_width, { fill = true, pad_left = #prefix })
 
     for j = 1, #wrap_message do
       table.insert(lines, wrap_message[j])
@@ -158,12 +190,7 @@ M.show_cursor_diagnostics = function(opts, bufnr)
 end
 
 M.show_line_diagnostics = function(opts, lnum, bufnr)
-  return show_diagnostics(opts or {}, function()
-    local buf = bufnr or vim.api.nvim_get_current_buf()
-    local line_num = lnum or (vim.api.nvim_win_get_cursor(0)[1] - 1)
-
-    return vim.diagnostic.get(buf, { lnum = line_num  })
-  end)
+  return show_diagnostics(opts or {}, get_line_diagnostics(lnum, bufnr))
 end
 
 M.navigate = function(direction)

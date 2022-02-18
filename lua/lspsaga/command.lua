@@ -15,6 +15,7 @@ local subcommands = {
   hover_doc = lsphover.render_hover_doc,
   show_cursor_diagnostics = diagnostic.show_cursor_diagnostics,
   show_line_diagnostics = diagnostic.show_line_diagnostics,
+  yank_line_diagnostics = diagnostic.yank_line_messages,
   diagnostic_jump_next = diagnostic.navigate "next",
   diagnostic_jump_prev = diagnostic.navigate "prev",
   code_action = codeaction.code_action,

@@ -63,33 +63,33 @@ end
 
 M.check = function()
   local active, _ = libs.check_lsp_active()
-  local current_file = vim.fn.expand "%:p"
+  local current_file = vim.api.nvim_buf_get_name(0)
   local is_file = vim.loop.fs_stat(current_file) ~= nil
-  local fb = vim.bo.filetype
+
+  if not active or not is_file or M.special_buffers[vim.bo.filetype] then
+    -- Lsp could become active after some time so we should not
+    -- use `M.server[current_file] = false` here
+    return
+  end
 
   if M.servers[current_file] == nil then
-    local clients = vim.lsp.get_active_clients()
-
-    for _, client in ipairs(clients) do
-      if
-        is_file
-        and client
-        and client.config.filetypes
-        and vim.tbl_contains(client.config.filetypes, fb)
-        and client.resolved_capabilities.code_action
-        and client.supports_method "code_action"
-      then
-        M.servers[current_file] = true
-        break
+    vim.lsp.for_each_buffer_client(vim.api.nvim_get_current_buf(), function(client)
+        if M.servers[current_file] then return end
+        if
+          client.resolved_capabilities.code_action
+          and client.supports_method "code_action"
+        then
+          M.servers[current_file] = true
+        end
       end
-    end
+    )
 
     if M.servers[current_file] == nil then
       M.servers[current_file] = false
     end
   end
 
-  if M.special_buffers[vim.bo.filetype] or not active or M.servers[current_file] == false then
+  if M.servers[current_file] == false then
     return
   end
 

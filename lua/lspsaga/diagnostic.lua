@@ -107,7 +107,7 @@ local show_diagnostics = function(opts, get_diagnostics)
     table.insert(highlights, 2, { 0, 'LspSagaDiagnosticTruncateLine' })
   end
 
-  local content_opts = { contents = lines, filetype = "plaintext", highlight = "LspSagaDiagnosticBorder" }
+  local content_opts = { contents = lines, filetype = "LspsagaDiagnostic", highlight = "LspSagaDiagnosticBorder" }
   local bufnr, winid = window.create_win_with_border(content_opts, opts)
 
   for i, hi in ipairs(highlights) do

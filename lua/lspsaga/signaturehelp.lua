@@ -74,7 +74,7 @@ local function focusable_preview(unique_name, fn)
 
     local content_opts = {
       contents = contents,
-      filetype = "sagasignature",
+      filetype = "LspsagaSignatureHelp",
       highlight = "LspSagaSignatureHelpBorder",
     }
 

@@ -191,7 +191,7 @@ function Finder:render_finder_result()
 
   local content_opts = {
     contents = self.contents,
-    filetype = "lspsagafinder",
+    filetype = "LspsagaFinder",
     enter = true,
     highlight = "LspSagaLspFinderBorder",
   }

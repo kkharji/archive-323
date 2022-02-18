@@ -19,8 +19,8 @@ M.require_diagnostics = {
 }
 
 M.special_buffers = {
-  ["LspSagaCodeAction"] = true,
-  ["lspsagafinder"] = true,
+  ["LspsagaCodeAction"] = true,
+  ["LspsagaFinder"] = true,
   ["NvimTree"] = true,
   ["vist"] = true,
   ["lspinfo"] = true,

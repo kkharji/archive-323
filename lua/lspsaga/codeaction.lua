@@ -28,7 +28,7 @@ local on_code_action_response = function(ctx)
 
     window.open {
       contents = window.content,
-      filetype = "LspSagaCodeAction",
+      filetype = "LspsagaCodeAction",
       enter = true,
       highlight = "LspSagaCodeActionBorder",
     }

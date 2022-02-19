@@ -190,7 +190,7 @@ M.toggle_virtual_text = function()
   else
     config.use_diagnostic_virtual_text = true
   end
-  vim.diagnostic.config({virtual_text = config.use_diagnostic_virtual_text})
+  vim.diagnostic.config({virtual_text = not config.use_diagnostic_virtual_text})
 end
 
 --- TODO: at some point just use builtin function to preview diagnostics

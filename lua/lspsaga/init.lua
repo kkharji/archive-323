@@ -9,6 +9,7 @@ saga.config_values = {
   hint_sign = "",
   infor_sign = "",
   diagnostic_header_icon = "   ",
+  use_diagnostic_virtual_text = true,
   -- diagnostic_show_source = true,
   -- diagnostic_show_code = true,
   -- code action title icon
@@ -101,6 +102,8 @@ saga.init_lsp_saga = function(opts)
   if config.code_action_prompt.enable then
     require("lspsaga.codeaction.indicator").attach()
   end
+
+  vim.diagnostic.config({virtual_text = config.use_diagnostic_virtual_text})
 end
 
 saga.setup = saga.init_lsp_saga

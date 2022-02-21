@@ -2,7 +2,7 @@ local api = vim.api
 local action = {}
 
 -- direction must 1 or -1
-function action.smart_scroll_with_saga(direction)
+function action.smart_scroll_with_saga(direction, alter)
   local hover = require "lspsaga.hover"
   local finder = require "lspsaga.provider"
   local signature = require "lspsaga.signaturehelp"
@@ -17,7 +17,7 @@ function action.smart_scroll_with_saga(direction)
   elseif implement.has_implement_win() then
     implement.scroll_in_implement(direction)
   else
-    local map = direction == 1 and "<C-f>" or "<C-b>"
+    local map = alter and alter or (direction == 1 and "<C-f>" or "<C-b>")
     local key = api.nvim_replace_termcodes(map, true, false, true)
     api.nvim_feedkeys(key, "n", true)
   end

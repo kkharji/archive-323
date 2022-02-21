@@ -1,7 +1,7 @@
 local api, lsp, util = vim.api, vim.lsp, vim.lsp.util
 local window = require "lspsaga.window"
 local action = require "lspsaga.action"
-local libs = require 'lspsaga.libs'
+local libs = require "lspsaga.libs"
 local npcall = vim.F.npcall
 local hover = {}
 

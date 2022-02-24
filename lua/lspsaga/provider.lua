@@ -500,7 +500,13 @@ function lspfinder.preview_definition(timeout_ms)
   if vim.tbl_islist(result) then
     for _, definition in ipairs(result) do
       if not vim.tbl_isempty(definition) and not vim.tbl_isempty(definition.result) then
-        local uri = definition.result[1].uri or definition.result[1].targetUri
+        local definition_result = nil
+        if definition.result[1] then
+          definition_result = definition_result[1]
+        else
+          definition_result = definition.result
+        end
+        local uri = definition_result.uri or definition_result.targetUri
         if #uri == 0 then
           return
         end
@@ -525,7 +531,7 @@ function lspfinder.preview_definition(timeout_ms)
         if not vim.api.nvim_buf_is_loaded(bufnr) then
           vim.fn.bufload(bufnr)
         end
-        local range = definition.result[1].targetRange or definition.result[1].range
+        local range = definition_result.targetRange or definition_result.range
         local start_line = 0
         if range.start.line - 3 >= 1 then
           start_line = range.start.line - 3

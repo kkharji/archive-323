@@ -80,7 +80,7 @@ lspsaga.setup { -- defaults ...
 
 ```lua
 --- In lsp attach function
-local map = vim.api.nvim_buf_set_keymap,
+local map = vim.api.nvim_buf_set_keymap
 map(0, "n", "gr", "<cmd>Lspsaga rename<cr>", {silent = true, noremap = true})
 map(0, "n", "gx", "<cmd>Lspsaga code_action<cr>", {silent = true, noremap = true})
 map(0, "x", "gx", ":<c-u>Lspsaga range_code_action<cr>", {silent = true, noremap = true})

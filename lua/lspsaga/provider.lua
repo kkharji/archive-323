@@ -502,7 +502,7 @@ function lspfinder.preview_definition(timeout_ms)
       if not vim.tbl_isempty(definition) and not vim.tbl_isempty(definition.result) then
         local definition_result = nil
         if definition.result[1] then
-          definition_result = definition_result[1]
+          definition_result = definition.result[1]
         else
           definition_result = definition.result
         end

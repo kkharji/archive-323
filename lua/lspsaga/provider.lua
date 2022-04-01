@@ -498,7 +498,7 @@ function lspfinder.preview_definition(timeout_ms)
   end
 
   if vim.tbl_islist(result) then
-    for _, definition in ipairs(result) do
+    for _, definition in pairs(result) do
       if not vim.tbl_isempty(definition) and not vim.tbl_isempty(definition.result) then
         local uri = definition.result[1].uri or definition.result[1].targetUri
         if #uri == 0 then

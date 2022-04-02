@@ -35,7 +35,7 @@ local send_request = function(timeout)
   for i, response in ipairs(responses) do
     if type(response) == "table" then
       for _, res in pairs(response) do
-        if res.result then
+        if res.result and next(res.result) ~= nil then
           coroutine.yield(res.result, i)
         end
       end

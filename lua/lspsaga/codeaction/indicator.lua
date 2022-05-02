@@ -76,7 +76,7 @@ M.check = function()
     vim.lsp.for_each_buffer_client(vim.api.nvim_get_current_buf(), function(client)
         if M.servers[current_file] then return end
         if
-          client.resolved_capabilities.code_action
+          client.server_capabilities.code_action
           and client.supports_method "code_action"
         then
           M.servers[current_file] = true

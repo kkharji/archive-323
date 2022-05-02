@@ -16,7 +16,7 @@ local function check_server_support_signaturehelp()
   end
   local clients = vim.lsp.buf_get_clients()
   for _, client in pairs(clients) do
-    if client.resolved_capabilities.signature_help == true then
+    if client.server_capabilities.signatureHelpProvider == true then
       return true
     end
   end

@@ -60,6 +60,7 @@ function Finder:lsp_finder_request()
     self.short_link = {}
     self.definition_uri = 0
     self.reference_uri = 0
+    self.key_index = 0
 
     local request_intance = coroutine.create(send_request)
     self.buf_filetype = api.nvim_buf_get_option(0, "filetype")
@@ -91,8 +92,9 @@ function Finder:create_finder_contents(result, method_type, root_dir)
       table.insert(self.contents, title)
       target_lnum = 2
       if result.saga_msg then
+        self.key_index = self.key_index + 1
         table.insert(self.contents, " ")
-        table.insert(self.contents, "[1] " .. result.saga_msg)
+        table.insert(self.contents, "[" .. self.key_index .. "] " .. result.saga_msg)
         return
       end
     else
@@ -101,13 +103,15 @@ function Finder:create_finder_contents(result, method_type, root_dir)
       table.insert(self.contents, " ")
       table.insert(self.contents, title)
       if result.saga_msg then
+        self.key_index = self.key_index + 1
         table.insert(self.contents, " ")
-        table.insert(self.contents, "[1] " .. result.saga_msg)
+        table.insert(self.contents, "[" .. self.key_index .. "] " .. result.saga_msg)
         return
       end
     end
 
     for index, _ in ipairs(result) do
+      self.key_index = self.key_index + 1
       local uri = result[index].targetUri or result[index].uri
       if uri == nil then
         return
@@ -135,7 +139,7 @@ function Finder:create_finder_contents(result, method_type, root_dir)
         short_name = libs.split_by_pathsep(link, 4)
       end
 
-      local target_line = "[" .. index .. "]" .. " " .. short_name
+      local target_line = "[" .. self.key_index .. "]" .. " " .. short_name
       local range = result[index].targetRange or result[index].range
       if index == 1 then
         table.insert(self.contents, " ")
@@ -153,6 +157,7 @@ function Finder:create_finder_contents(result, method_type, root_dir)
 
       self.short_link[target_lnum] = {
         link = link,
+        target_lnum = target_lnum,
         preview = lines,
         row = range.start.line + 1,
         col = range.start.character + 1,
@@ -235,6 +240,17 @@ function Finder:apply_float_map()
     { self.bufnr, "n", action.scroll_down, ":lua require'lspsaga.provider'.scroll_in_preview(1)<CR>" },
     { self.bufnr, "n", action.scroll_up, ":lua require'lspsaga.provider'.scroll_in_preview(-1)<CR>" },
   }
+
+  for i = 1, self.key_index do
+    local first_def_uri_lnum = self.definition_uri ~= 0 and 3 or 5
+    local last_def_uri_lnum = 3 + self.definition_uri - 1
+    local key = tostring(i)
+    local line = i + first_def_uri_lnum - 1
+    if line > last_def_uri_lnum then
+      line = line + 3
+    end
+    table.insert(keymaps, { self.bufnr, "n", key, ":call cursor(" .. tostring(line) .. ", 2)<CR>" })
+  end
 
   if type(action.open) == "table" then
     for _, key in ipairs(action.open) do
@@ -442,7 +458,7 @@ function Finder:clear_tmp_data()
   self.WIN_HEIGHT = 0
   self.WIN_WIDTH = 0
   if self.cursor_line_bg ~= '' then
-    api.nvim_command('hi! CursorLine  guibg='..self.cursor_line_bg)
+    api.nvim_command('hi! CursorLine  guibg=' .. self.cursor_line_bg)
   end
   if self.cursor_line_fg == '' then
     api.nvim_command('hi! CursorLine  guifg=NONE')

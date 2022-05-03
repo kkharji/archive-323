@@ -34,7 +34,7 @@ M.code_action_execute = function(client_id, action, ctx)
   if
     not action.edit
     and client
-    and type(client.server_capabilities.code_action) == "table"
+    and type(client.server_capabilities.codeActionProvider) == "table"
     and client.server_capabilities.codeActionProvider.resolveProvider
   then
     client.request("codeAction/resolve", action, function(err, resolved_action)

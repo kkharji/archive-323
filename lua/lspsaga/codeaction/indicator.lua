@@ -75,8 +75,14 @@ M.check = function()
   if M.servers[current_file] == nil then
     vim.lsp.for_each_buffer_client(vim.api.nvim_get_current_buf(), function(client)
         if M.servers[current_file] then return end
+        local is_nightly = vim.fn.has("nvim-0.8.0")
+        -- Test code action table with version binding
         if
-          client.server_capabilities.codeActionProvider
+          (
+            (is_nightly and client.server_capabilities.codeActionProvider)
+            or
+            (not is_nightly and client.resolved_capabilities.code_action)
+          )
           and client.supports_method "code_action"
         then
           M.servers[current_file] = true

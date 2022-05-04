@@ -31,23 +31,19 @@ end
 
 M.code_action_execute = function(client_id, action, ctx)
   local client = vim.lsp.get_client_by_id(client_id)
-  local is_nightly = vim.fn.has("nvim-0.8.0")
+
+  local code_action_provide = nil
+  if vim.fn.has("nvim-0.8.0") then
+    code_action_provide = client.server_capabilities.codeActionProvider
+  else
+    code_action_provide = client.resolved_capabilities.code_action
+  end
+
   if
     not action.edit
     and client
-    and
-    (
-      ( is_nightly
-        and type(client.server_capabilities.codeActionProvider) == "table"
-        and client.server_capabilities.codeActionProvider.resolveProvider
-      )
-      or
-      (
-        not is_nightly
-        and type(client.resolved_capabilities.code_action) == "table"
-        and client.resolved_capabilities.code_action.resolveProvider
-      )
-    )
+    and type(code_action_provide) == "table"
+    and code_action_provide.resolveProvider
   then
     client.request("codeAction/resolve", action, function(err, resolved_action)
       if err then

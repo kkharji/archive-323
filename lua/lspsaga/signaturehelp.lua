@@ -17,11 +17,14 @@ local function check_server_support_signaturehelp()
   local clients = vim.lsp.buf_get_clients()
   local is_nightly = vim.fn.has("nvim-0.8.0")
   for _, client in pairs(clients) do
-    if
-      (is_nightly and client.server_capabilities.signatureHelpProvider)
-      or
-      (not is_nightly and client.resolved_capabilities.signature_help == true)
-    then
+    local provider = nil
+    if is_nightly then
+      provider = client.server_capabilities.signatureHelpProvider -- table
+    else
+      provider = client.resolved_capabilities.signature_help -- boolean
+    end
+
+    if provider then
       return true
     end
   end

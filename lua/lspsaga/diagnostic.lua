@@ -27,6 +27,8 @@ end
 local format_message = function(diagnostic)
     local message = string.gsub(config.diagnostic_message_format, '%%m', diagnostic.message)
 
+    message = string.gsub(message, '%%s', diagnostic.source)
+
     if diagnostic.user_data and diagnostic.user_data.lsp and diagnostic.user_data.lsp.code then
         message = string.gsub(message, '%%c', '[' .. diagnostic.user_data.lsp.code .. ']')
     else

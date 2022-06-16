@@ -59,9 +59,10 @@ end
 M.execute = function(choice_num)
   local choice = M.actions[choice_num or tonumber(vim.fn.expand "<cword>")]
   if choice then
+    local ctx = M.ctx
     M.close()
     local client_id, action = choice[1], choice[2]
-    api.code_action_execute(client_id, action, M.ctx)
+    api.code_action_execute(client_id, action, ctx)
     return
   end
   M.close()

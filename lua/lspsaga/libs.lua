@@ -168,12 +168,15 @@ function libs.focusable_float(unique_name, fn)
     return api.nvim_command "wincmd p"
   end
   local bufnr = api.nvim_get_current_buf()
-  do
+  -- Currently, this function is reused by both hover and signaturehelp
+  -- according to the vim.lsp.buf.signature_help(), we shouldn't jump
+  -- to the preview window in this case. Since many users will automatically
+  -- trigger signature_help with CursorHoldI event, check for #81 more info
+  -- https://github.com/tami5/lspsaga.nvim/issues/81
+  if string.find(string.lower(unique_name), "hover") ~= nil then -- in case the unique_name will change in the future
     local win = find_window_by_var(unique_name, bufnr)
     if win and api.nvim_win_is_valid(win) and vim.fn.pumvisible() == 0 then
       api.nvim_set_current_win(win)
-      api.nvim_buf_set_keymap(0, "n", "<Esc>", "<cmd>close!<cr>", {nowait = true, silent = true, noremap = true})
-      api.nvim_buf_set_keymap(0, "n", "<C-c>", "<cmd>close!<cr>", {nowait = true, silent = true, noremap = true})
       api.nvim_command "stopinsert"
       return
     end

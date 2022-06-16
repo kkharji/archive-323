@@ -13,7 +13,7 @@ TODO .......
 ### Packer
 
 ```lua
-use { 'tami5/lspsaga.nvim' }  -- nightly 
+use { 'tami5/lspsaga.nvim' }  -- nightly
 use { 'tami5/lspsaga.nvim', branch = 'nvim6.0' or 'nvim51' } -- for specific version
 ```
 
@@ -80,7 +80,7 @@ lspsaga.setup { -- defaults ...
 
 ```lua
 --- In lsp attach function
-local map = nvim_buf_set_keymap,
+local map = vim.api.nvim_buf_set_keymap
 map(0, "n", "gr", "<cmd>Lspsaga rename<cr>", {silent = true, noremap = true})
 map(0, "n", "gx", "<cmd>Lspsaga code_action<cr>", {silent = true, noremap = true})
 map(0, "x", "gx", ":<c-u>Lspsaga range_code_action<cr>", {silent = true, noremap = true})
@@ -88,8 +88,8 @@ map(0, "n", "K",  "<cmd>Lspsaga hover_doc<cr>", {silent = true, noremap = true})
 map(0, "n", "go", "<cmd>Lspsaga show_line_diagnostics<cr>", {silent = true, noremap = true})
 map(0, "n", "gj", "<cmd>Lspsaga diagnostic_jump_next<cr>", {silent = true, noremap = true})
 map(0, "n", "gk", "<cmd>Lspsaga diagnostic_jump_prev<cr>", {silent = true, noremap = true})
-map(0, "n", "<C-u>", "<cmd>lua require('lspsaga.action').smart_scroll_with_saga(-1)<cr>")
-map(0, "n", "<C-d>", "<cmd>lua require('lspsaga.action').smart_scroll_with_saga(1)<cr>")
+map(0, "n", "<C-u>", "<cmd>lua require('lspsaga.action').smart_scroll_with_saga(-1, '<c-u>')<cr>", {})
+map(0, "n", "<C-d>", "<cmd>lua require('lspsaga.action').smart_scroll_with_saga(1, '<c-d>')<cr>", {})
 ```
 
 ## Customize Appearance
@@ -141,6 +141,26 @@ The available highlight groups are:
 | `LspSagaAutoPreview` | |
 | `LspSagaDefPreviewBorder` | |
 | `LspLinesDiagBorder` | |
+
+## Filetypes
+
+Autocmds can be added for dedicated filetypes of LspSaga floating windows.
+For example, one can use `<Esc>` to close the hover window when jumping into it by calling `:Lspsaga hover_doc` twice.
+```vim
+augroup lspsaga_filetypes
+  autocmd!
+  autocmd FileType LspsagaHover nnoremap <buffer><nowait><silent> <Esc> <cmd>close!<cr>
+augroup END
+```
+
+The available filetypes are:
+* `LspsagaCodeAction`
+* `LspsagaDiagnostic`
+* `LspsagaFinder`
+* `LspsagaFloaterm`
+* `LspsagaHover`
+* `LspsagaRename`
+* `LspsagaSignatureHelp`
 
 # License
 

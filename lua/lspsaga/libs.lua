@@ -70,16 +70,20 @@ function libs.result_isempty(res)
   end
   for _, v in pairs(res) do
     if next(v) == nil then
-      return true
+      goto continue
     end
     if not v.result then
-      return true
+      goto continue
     end
     if next(v.result) == nil then
-      return true
+      goto continue
     end
+    if next(v.result) ~= nil then
+      return false
+    end
+    ::continue::
   end
-  return false
+  return true
 end
 
 function libs.split_by_pathsep(text, start_pos)

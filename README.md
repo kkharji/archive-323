@@ -13,8 +13,8 @@ TODO .......
 ### Packer
 
 ```lua
-use { 'tami5/lspsaga.nvim' }  -- nightly
-use { 'tami5/lspsaga.nvim', branch = 'nvim6.0' or 'nvim51' } -- for specific version
+use { 'kkharji/lspsaga.nvim' }  -- nightly
+use { 'kkharji/lspsaga.nvim', branch = 'nvim6.0' or 'nvim51' } -- for specific version
 ```
 
 ## Requirements

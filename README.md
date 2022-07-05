@@ -2,7 +2,7 @@
 
 A maintained fork of glepnir/lspsaga.nvim.
 
-Lspsaga is light-weight lsp plugin based on neovim built-in lsp with highly a performant UI. [SEE IN ACTION](https://github.com/tami5/lspsaga.nvim/wiki)
+Lspsaga is light-weight lsp plugin based on neovim built-in lsp with highly a performant UI. [SEE IN ACTION](https://github.com/kkharji/lspsaga.nvim/wiki)
 
 ## Features
 
@@ -13,8 +13,8 @@ TODO .......
 ### Packer
 
 ```lua
-use { 'tami5/lspsaga.nvim' }  -- nightly
-use { 'tami5/lspsaga.nvim', branch = 'nvim6.0' or 'nvim51' } -- for specific version
+use { 'kkharji/lspsaga.nvim' }  -- nightly
+use { 'kkharji/lspsaga.nvim', branch = 'nvim6.0' or 'nvim51' } -- for specific version
 ```
 
 ## Requirements

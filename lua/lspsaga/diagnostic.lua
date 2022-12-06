@@ -20,22 +20,24 @@ local get_line_diagnostics = function(lnum, bufnr)
     local buf = bufnr or vim.api.nvim_get_current_buf()
     local line_num = lnum or (vim.api.nvim_win_get_cursor(0)[1] - 1)
 
-    return vim.diagnostic.get(buf, { lnum = line_num  })
+    return vim.diagnostic.get(buf, { lnum = line_num })
   end
 end
 
 local format_message = function(diagnostic)
-    local message = string.gsub(config.diagnostic_message_format, '%%m', diagnostic.message)
+  local message = string.gsub(config.diagnostic_message_format, "%%m", diagnostic.message)
 
-    message = string.gsub(message, '%%s', diagnostic.source)
+  if diagnostic.source then
+    message = string.gsub(message, "%%s", diagnostic.source)
+  end
 
-    if diagnostic.user_data and diagnostic.user_data.lsp and diagnostic.user_data.lsp.code then
-        message = string.gsub(message, '%%c', '[' .. diagnostic.user_data.lsp.code .. ']')
-    else
-        message = string.gsub(message, '%%c', '')
-    end
+  if diagnostic.user_data and diagnostic.user_data.lsp and diagnostic.user_data.lsp.code then
+    message = string.gsub(message, "%%c", "[" .. diagnostic.user_data.lsp.code .. "]")
+  else
+    message = string.gsub(message, "%%c", "")
+  end
 
-    return vim.fn.trim(message)
+  return vim.fn.trim(message)
 end
 
 M.yank_line_messages = function(opts, lnum, bufnr)
@@ -45,15 +47,15 @@ M.yank_line_messages = function(opts, lnum, bufnr)
     table.insert(messages, format_message(diagnostic))
   end
   if #messages == 0 then
-    print('No diagnostics found')
+    print "No diagnostics found"
     return
   end
-  local reg = opts or '+' -- yank to + by default
+  local reg = opts or "+" -- yank to + by default
   local message = messages[1]
   for i = 2, #messages do
-    message = message .. '\n' .. messages[i]
+    message = message .. "\n" .. messages[i]
   end
-  print('Copied to registry ' .. reg)
+  print("Copied to registry " .. reg)
   vim.fn.setreg(reg, message)
 end
 
@@ -105,22 +107,22 @@ local show_diagnostics = function(opts, get_diagnostics)
     config.error_sign,
     config.warn_sign,
     config.infor_sign,
-    config.hint_sign
+    config.hint_sign,
   }
 
   for i, diagnostic in ipairs(diagnostics) do
     local hiname = M.highlights[diagnostic.severity]
     assert(hiname, "unknown severity: " .. tostring(diagnostic.severity))
 
-    local prefix = string.gsub(config.diagnostic_prefix_format, '%%s', signs[diagnostic.severity])
-    prefix = string.gsub(prefix, '%%d', i)
+    local prefix = string.gsub(config.diagnostic_prefix_format, "%%s", signs[diagnostic.severity])
+    prefix = string.gsub(prefix, "%%d", i)
 
     local message = format_message(diagnostic)
 
     local message_lines = vim.split(message, "\n", true)
     message_lines[1] = prefix .. message_lines[1]
     for j = 2, #message_lines do
-        message_lines[j] = string.rep(' ', #prefix) .. message_lines[j]
+      message_lines[j] = string.rep(" ", #prefix) .. message_lines[j]
     end
     local wrap_message = wrap.wrap_contents(message_lines, max_width, { fill = true, pad_left = #prefix })
 
@@ -138,7 +140,7 @@ local show_diagnostics = function(opts, get_diagnostics)
   if show_header then
     local truncate_line = wrap.add_truncate_line(lines)
     table.insert(lines, 2, truncate_line)
-    table.insert(highlights, 2, { 0, 'LspSagaDiagnosticTruncateLine' })
+    table.insert(highlights, 2, { 0, "LspSagaDiagnosticTruncateLine" })
   end
 
   local content_opts = { contents = lines, filetype = "LspsagaDiagnostic", highlight = "LspSagaDiagnosticBorder" }
@@ -163,7 +165,7 @@ M.show_cursor_diagnostics = function(opts, bufnr)
 
     return vim.tbl_filter(
       function(diagnostic)
-        local start_line, start_char = diagnostic['lnum'], diagnostic["col"]
+        local start_line, start_char = diagnostic["lnum"], diagnostic["col"]
         local end_line, end_char = diagnostic["end_lnum"], diagnostic["end_col"]
         local one_line_diag = start_line == end_line
 
@@ -215,7 +217,7 @@ end
 
 M.toggle_virtual_text = function()
   config.use_diagnostic_virtual_text = not config.use_diagnostic_virtual_text
-  vim.diagnostic.config({virtual_text = config.use_diagnostic_virtual_text})
+  vim.diagnostic.config { virtual_text = config.use_diagnostic_virtual_text }
 end
 
 --- TODO: at some point just use builtin function to preview diagnostics

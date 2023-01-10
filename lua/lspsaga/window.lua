@@ -336,7 +336,9 @@ function M.fancy_floating_markdown(contents, opts)
   local cwin = vim.api.nvim_get_current_win()
   vim.api.nvim_set_current_win(winid)
 
-  vim.cmd "ownsyntax markdown"
+  vim.cmd "ownsyntax lsp_markdown"
+  vim.api.nvim_win_set_option(winid, 'conceallevel', 2)
+  vim.api.nvim_win_set_option(winid, 'concealcursor', 'n')
   local idx = 1
   --@private
   local function apply_syntax_to_region(ft, start, finish)

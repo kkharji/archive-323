@@ -22,7 +22,7 @@ local execute = function(client, action, ctx)
     if fn then
       local enriched_ctx = vim.deepcopy(ctx)
       enriched_ctx.client_id = client.id
-      fn(command, ctx)
+      fn(command, enriched_ctx)
     else
       vim.lsp.buf.execute_command(command)
     end
@@ -30,6 +30,7 @@ local execute = function(client, action, ctx)
 end
 
 M.code_action_execute = function(client_id, action, ctx)
+  print(action.edit, action.command)
   local client = vim.lsp.get_client_by_id(client_id)
 
   local code_action_provide = nil
@@ -45,7 +46,7 @@ M.code_action_execute = function(client_id, action, ctx)
     and type(code_action_provide) == "table"
     and code_action_provide.resolveProvider
   then
-    client.request("codeAction/resolve", action, function(err, resolved_action)
+    client.request("codeAction/resolve", action, function(err, resolved_action, ctx)
       if err then
         vim.notify(err.code .. ": " .. err.message, vim.log.levels.ERROR)
         return

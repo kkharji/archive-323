@@ -13,8 +13,11 @@ local on_code_action_response = function(ctx)
     local actionNum = 1
     for client_id, result in pairs(response or {}) do
       for _, action in ipairs(result.result or {}) do
+        -- Remove newline characters so that nvim_buf_set_lines doesn't fail
+        local single_line_title = string.gsub(action.title, '\n.*', ' (...)')
+
         table.insert(window.actions, { client_id, action })
-        table.insert(window.content, "[" .. actionNum .. "]" .. " " .. action.title)
+        table.insert(window.content, "[" .. actionNum .. "]" .. " " .. single_line_title)
         actionNum = actionNum + 1
       end
     end

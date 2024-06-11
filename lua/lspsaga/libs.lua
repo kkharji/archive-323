@@ -149,8 +149,8 @@ function libs.apply_keys(ns, actions)
 end
 
 function libs.close_preview_autocmd(events, winid)
-  local events_str = table.concat(events, ',')
-  local cmd = string.format('autocmd %s <buffer> ++once lua pcall(vim.api.nvim_win_close, %d, true)', events_str, winid)
+  local events_str = table.concat(events, ",")
+  local cmd = string.format("autocmd %s <buffer> ++once lua pcall(vim.api.nvim_win_close, %d, true)", events_str, winid)
   vim.api.nvim_command(cmd)
 end
 
@@ -176,8 +176,12 @@ function libs.focusable_float(unique_name, fn)
   if string.find(string.lower(unique_name), "hover") ~= nil then -- in case the unique_name will change in the future
     local win = find_window_by_var(unique_name, bufnr)
     if win and api.nvim_win_is_valid(win) and vim.fn.pumvisible() == 0 then
-      api.nvim_set_current_win(win)
-      api.nvim_command "stopinsert"
+      -- NOTE: Disable calling hover twice to insert to buffer
+      -- In python, with pyright and jedi. The buffer is entered from first call
+      if vim.bo.filetype ~= "python" then
+        api.nvim_set_current_win(win)
+        api.nvim_command "stopinsert"
+      end
       return
     end
   end
@@ -187,6 +191,5 @@ function libs.focusable_float(unique_name, fn)
     return pbufnr, pwinnr
   end
 end
-
 
 return libs
